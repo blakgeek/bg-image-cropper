@@ -1,0 +1,17 @@
+<div class="bgic-source" ng-class="[sourceState, {'bgic-no-image': !src}]">
+    <div class="bgic-selection">
+        <div class="bgic-bar bgic-bar-top"></div>
+        <div class="bgic-bar bgic-bar-bottom"></div>
+        <div class="bgic-bar bgic-bar-left"></div>
+        <div class="bgic-bar bgic-bar-right"></div>
+        <div data-resize-dir="ne" class="bgic-handle bgic-handle-tr"></div>
+        <div data-resize-dir="nw" class="bgic-handle bgic-handle-tl"></div>
+        <div data-resize-dir="se" class="bgic-handle bgic-handle-br"></div>
+        <div data-resize-dir="sw" class="bgic-handle bgic-handle-bl"></div>
+    </div>
+    <img ng-src="{{src}}"/>
+</div>
+<canvas class="bgic-preview" ng-class="{rounded: previewRounded}" width="{{previewWidth}}" height="{{previewHeight}}"></canvas>
+<input class="bgic-picker" type="file"/>
+<div class="bgic-filename">{{filename}}</div>
+<button class="bgic-apply" ng-click="savePic()">Clip It!</button>

@@ -1,0 +1,27 @@
+{
+  "name": "bg-image-cropper",
+  "version": "0.1.1",
+  "authors": [
+    "Carlos \"blakgeek\" Lawton"
+  ],
+  "description": "An image cropper and upload control",
+  "main": ["dist/cropper.js", "dist/cropper.css"],
+  "keywords": [
+    "angular",
+    "image",
+    "cropper",
+    "upload"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.4.3",
+    "blueimp-canvas-to-blob": "~2.2.0"
+  }
+}
