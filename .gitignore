@@ -1,1 +1,7 @@
-# Created by .ignore support plugin (hsz.mobi)
+.idea/
+.sass-cache/
+.tmp/
+bower_components/
+node_modules/
+dev/
+*.iml
