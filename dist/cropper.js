@@ -1,51 +1,8 @@
+angular.module('bg.imageCropper', []);
+
 // todo: use image bounds instead of target to restrict the selection.
 
-angular.module('bg.imageCropper', [])
-    .factory('bgImageCropper', [
-        '$rootScope', '$q', function($rootScope, $q) {
-
-            var promises = {},
-                promiseCtr = 0;
-
-            function loadImage(src) {
-
-                $rootScope.$emit('bgic.load', src);
-            }
-
-            function chooseImage() {
-
-                $rootScope.$emit('bgic.choose');
-            }
-
-            function clearImage() {
-
-                $rootScope.$emit('bgic.clear');
-            }
-
-            function captureSelection() {
-
-                var id = promiseCtr++,
-                    deferred = $q.defer();
-                promises[id] = deferred;
-                $rootScope.$emit('bgic.capture', id);
-
-                return deferred.promise;
-            }
-
-            $rootScope.$on('bgic.captured', function(e, id, pic) {
-
-                promises[id].resolve(pic);
-                delete promises[id];
-            });
-
-            return {
-                loadImage: loadImage,
-                clearImage: clearImage,
-                chooseImage: chooseImage,
-                captureSelection: captureSelection
-            };
-        }
-    ])
+angular.module('bg.imageCropper')
     .directive('bgImageCropper', [
         '$document', function($document) {
 
@@ -69,7 +26,8 @@ angular.module('bg.imageCropper', [])
                     startTop, startLeft,
                     startWidth, startHeight,
                     maxSize, resizeDir,
-                    startX, startY, scale;
+                    startX, startY, scale,
+                    listeners = [];
 
                 selection.addEventListener('mousedown', function(e) {
 
@@ -260,30 +218,37 @@ angular.module('bg.imageCropper', [])
                     });
                 };
 
-                $rootScope.$on('bgic.clear', function() {
+                listeners.push($rootScope.$on('bgic.clear', function() {
 
                     delete $scope.src;
                     delete $scope.filename;
                     context.clearRect(0, 0, $scope.previewHeight, $scope.previewWidth);
-                });
+                }));
 
-                $rootScope.$on('bgic.load', function(e, src) {
+                listeners.push($rootScope.$on('bgic.load', function(e, src) {
 
                     $scope.src = src;
-                });
+                }));
 
-                $rootScope.$on('bgic.choose', function() {
+                listeners.push($rootScope.$on('bgic.choose', function() {
 
                     // todo: add support for MouseEvent since this way is deprecated but it's the one supported  in IE
                     var event = document.createEvent("MouseEvents");
                     event.initMouseEvent("click");
                     fileInput.dispatchEvent(event);
 
-                });
+                }));
 
-                $rootScope.$on('bgic.capture', function(e, callbackId) {
+                listeners.push($rootScope.$on('bgic.capture', function(e, callbackId) {
 
                     $scope.savePic(callbackId);
+                }));
+
+                $scope.$on('$destroy', function() {
+
+                    listeners.forEach(function(listener) {
+                        listener();
+                    });
                 });
             }
 
@@ -298,6 +263,57 @@ angular.module('bg.imageCropper', [])
                 restrict: 'E',
                 templateUrl: '/templates/cropper.html',
                 controller: ['$scope', '$element', '$rootScope', controller]
+            };
+        }
+    ]);
+
+// todo: use image bounds instead of target to restrict the selection.
+
+angular.module('bg.imageCropper')
+    .factory('bgImageCropper', [
+        '$rootScope', '$q', function($rootScope, $q) {
+
+            var promises = {},
+                promiseCtr = 0;
+
+            function loadImage(src) {
+
+                $rootScope.$emit('bgic.load', src);
+            }
+
+            function chooseImage() {
+
+                $rootScope.$emit('bgic.choose');
+            }
+
+            function clearImage() {
+
+                $rootScope.$emit('bgic.clear');
+            }
+
+            function captureSelection() {
+
+                var id = promiseCtr++,
+                    deferred = $q.defer();
+                promises[id] = deferred;
+                $rootScope.$emit('bgic.capture', id);
+
+                return deferred.promise;
+            }
+
+            $rootScope.$on('bgic.captured', function(e, id, pic) {
+
+                if(promises[id]) {
+                    promises[id].resolve(pic);
+                    delete promises[id];
+                }
+            });
+
+            return {
+                loadImage: loadImage,
+                clearImage: clearImage,
+                chooseImage: chooseImage,
+                captureSelection: captureSelection
             };
         }
     ]);
